@@ -26,7 +26,7 @@ app.post('/auth', (req, res) => {
     switch (req.body.channel_name.split('-')[0]) {
         case 'presence':
             res.json(socketBus.authPresence(req.body.socket_id, req.body.channel_name, true, {
-                user: 'teste'
+                user: req.body.user
             }))
             break;
         case 'private':

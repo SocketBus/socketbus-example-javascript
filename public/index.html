@@ -10,14 +10,12 @@
         <div class="container">
             <div class="row justify-content-center">
                 <div class="col-md-3 pt-5">
-                    <div class="card card-body">
+                    <div class="card card-body" id="users">
                         <div class="font-weight-bold mb-4">Usuários</div>
-                        <div id="users-online-example">
-                            <div class="pb-2">
-                                :name
+                        <div id="users-online-example"  class="pb-2" style="display: none;">
+                            :user
 
-                                <span class="float-right d-inline-block bg-success" style="border-radius: 99px; width: 15px; height: 15px;"></span>
-                            </div>
+                            <span class="float-right d-inline-block bg-success" style="border-radius: 99px; width: 15px; height: 15px;"></span>
                         </div>
                     </div>
                 </div>
@@ -75,16 +73,31 @@
                     document.getElementById('messages').appendChild(messageElement);
                 });
 
+            function statusUser(user, status) {
+                if (user === myName) return;
+
+                
+                let userElement = document.getElementById(user);
+                if (!userElement) {
+                    userElement = document.getElementById('users-online-example').cloneNode(true);
+                    userElement.id = user;
+                    userElement.style.display = 'block';
+                    userElement.innerHTML = userElement.innerHTML.replace(':user', user);
+
+                    document.getElementById('users').appendChild(userElement);
+                }
+
+                let remove = status ? 'bg-secondary' : 'bg-success';
+                let add = !status ? 'bg-secondary' : 'bg-success';
+
+                userElement.children[0].classList.remove(remove)
+                userElement.children[0].classList.add(add)
+            }
+
             socketBus.join(channelName)
-                .here((users)=>{
-                    console.log(users);
-                })
-                .joining(user => {
-
-                })
-                .leaving(user => {
-
-                })
+                .here((users)=>users.map(u => statusUser(u.user, true)))
+                .joining(user => statusUser(user.user, true))
+                .leaving(user => statusUser(user.user, false))
 
             document.getElementById('form').addEventListener('submit', function() {
                 const message = document.getElementById('message').value;
