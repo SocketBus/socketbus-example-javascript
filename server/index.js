@@ -22,9 +22,17 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname + '/../public/index.html'));
 });
 
-
 app.post('/auth', (req, res) => {
-    res.json(socketBus.auth(req.body.socket_id, req.body.channel_name, true))
+    switch (req.body.channel_name.split('-')[0]) {
+        case 'presence':
+            res.json(socketBus.authPresence(req.body.socket_id, req.body.channel_name, true, {
+                user: 'teste'
+            }))
+            break;
+        case 'private':
+            res.json(socketBus.auth(req.body.socket_id, req.body.channel_name, true))
+            break;
+    }
 });
 
 app.post('/broadcast', (req, res) => {
@@ -32,7 +40,6 @@ app.post('/broadcast', (req, res) => {
         message: req.body.message,
         user: req.body.user
     }).then(response => {
-        console.log(response, req.body);
         res.json({
             message: 'sent'
         });
